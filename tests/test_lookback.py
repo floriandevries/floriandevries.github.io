@@ -62,3 +62,8 @@ def test_lookback_commits_data_file():
         args = shlex.split(step["with"]["claude_args"])
         tools = set(args[args.index("--allowedTools") + 1].split(","))
         assert tools == {"Bash(gh issue create:*)", "Bash(gh issue list:*)", "Read"}
+
+
+def test_waiting_counts_each_item_once():
+    items = [{"number": 1}, {"number": 1}, {"number": 2}]
+    assert lookback.summarize([], items, "2026-10")["waiting"] == 2
