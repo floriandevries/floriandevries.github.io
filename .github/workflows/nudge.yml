@@ -1,0 +1,47 @@
+name: Nudge
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: nudge
+  cancel-in-progress: false
+
+jobs:
+  nudge:
+    if: github.event_name == 'schedule' || github.actor == 'fjdev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: scripts
+        run: |
+          set -euo pipefail
+          issues=$(gh issue list --state open --limit 200 --json number,state,labels,createdAt,author,comments)
+          prs=$(gh pr list --state open --limit 200 --json number,state,labels,createdAt,author,reviews,comments,isDraft)
+          jq -n --argjson issues "$issues" --argjson prs "$prs" '{issues: $issues, prs: $prs}' \
+            | python -m fjdev.nudge > nudges.txt
+          while read -r kind number; do
+            if [ "$kind" = pr ]; then
+              body="Nudge: this draft has been waiting four days for your review."
+            else
+              body="Nudge: this one is waiting on your answer. Rough bullets are enough."
+            fi
+            gh issue comment "$number" --body "$body"
+            gh issue edit "$number" --add-label nudged
+          done < nudges.txt
+      - if: failure()
+        uses: ./.github/actions/report-failure
