@@ -30,6 +30,7 @@ jobs:
           PYTHONPATH: scripts
         run: |
           set -euo pipefail
+          gh label create nudged --color D93F0B --description "Owner already nudged about this item" --force
           issues=$(gh issue list --state open --limit 200 --json number,state,labels,createdAt,author,comments)
           prs=$(gh pr list --state open --limit 200 --json number,state,labels,createdAt,author,reviews,comments,isDraft)
           jq -n --argjson issues "$issues" --argjson prs "$prs" '{issues: $issues, prs: $prs}' \

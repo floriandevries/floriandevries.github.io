@@ -29,6 +29,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PYTHONPATH: scripts
         run: |
+          gh label create this-week --color 5319E7 --description "Selected for this week's push" --force
           title=$(python -m fjdev.week title)
           existing=$(gh issue list --label this-week --state open --json number,title,state | python -m fjdev.week find "$title")
           echo "title=$title" >> "$GITHUB_OUTPUT"

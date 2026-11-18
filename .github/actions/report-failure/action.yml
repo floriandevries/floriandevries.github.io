@@ -9,6 +9,7 @@ runs:
         TITLE: "Workflow failed: ${{ github.workflow }}"
         RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
+        gh label create workflow-failure --color B60205 --description "A scheduled workflow failed" --force
         existing=$(gh issue list --label workflow-failure --state open --json number,title \
           --jq "map(select(.title == env.TITLE)) | .[0].number // empty")
         if [ -n "$existing" ]; then

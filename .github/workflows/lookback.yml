@@ -29,6 +29,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PYTHONPATH: scripts
         run: |
+          gh label create lookback --color FBCA04 --description "Monthly look-back review" --force
           {
             gh issue list --label idea --state open --json number,title
             gh issue list --label this-week --state open --json number,title
