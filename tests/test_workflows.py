@@ -76,3 +76,23 @@ def test_scheduled_workflows_report_failure():
             last = job["steps"][-1]
             assert last["uses"] == "./.github/actions/report-failure", name
             assert last["if"] == "failure()", name
+
+
+def tool_list(step, flag):
+    args = shlex.split(step["with"]["claude_args"])
+    return args[args.index(flag) + 1].split(",") if flag in args else []
+
+
+def test_no_bare_edit_or_write_tools():
+    for path in WORKFLOWS.glob("*.yml"):
+        for name, step in claude_action_steps(yaml.safe_load(path.read_text())["jobs"]):
+            tools = tool_list(step, "--allowedTools")
+            assert not {"Edit", "Write", "MultiEdit"} & set(tools), (path.name, name)
+
+
+def test_respond_job_limits_input_and_edits():
+    respond = load("claude.yml")["jobs"]["respond"]
+    (_, step), = claude_action_steps({"respond": respond})
+    assert step["with"]["include_comments_by_actor"] == "fjdev,claude[bot]"
+    denied = set(tool_list(step, "--disallowedTools"))
+    assert {"Edit(scripts/**)", "Edit(.github/**)"} <= denied
