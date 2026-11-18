@@ -1,0 +1,17 @@
+name: Idea
+description: Capture a blog post idea for the weekly push
+title: "Idea: "
+labels: ["idea"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What is the idea?
+      description: One or two sentences on the post you want to write.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Optional. Links, notes or why it matters now.
