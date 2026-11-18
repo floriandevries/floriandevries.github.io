@@ -1,3 +1,4 @@
+import shlex
 from pathlib import Path
 
 import yaml
@@ -45,3 +46,32 @@ def test_claude_workflow_restricted_to_owner():
             ), name
     assert action_steps == len(jobs)
     assert assert_claude_steps_strict(jobs) == len(jobs)
+
+
+def load(name):
+    return yaml.safe_load((WORKFLOWS / name).read_text())
+
+
+def test_scout_tools_limited():
+    wf = load("scout.yml")
+    assert wf["permissions"]["contents"] == "read"
+    tools = set()
+    for _, step in claude_action_steps(wf["jobs"]):
+        args = shlex.split(step["with"]["claude_args"])
+        tools |= set(args[args.index("--allowedTools") + 1].split(","))
+    assert tools == {
+        "Bash(gh issue create:*)",
+        "Bash(gh issue list:*)",
+        "WebFetch",
+        "WebSearch",
+    }
+
+
+def test_scheduled_workflows_report_failure():
+    for name in ("weekly.yml", "scout.yml"):
+        jobs = load(name)["jobs"]
+        assert assert_claude_steps_strict(jobs) == 1
+        for job in jobs.values():
+            last = job["steps"][-1]
+            assert last["uses"] == "./.github/actions/report-failure", name
+            assert last["if"] == "failure()", name

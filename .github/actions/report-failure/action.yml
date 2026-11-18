@@ -1,0 +1,18 @@
+name: Report failure
+description: Open an issue, or comment on the open one, when a scheduled workflow fails.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TITLE: "Workflow failed: ${{ github.workflow }}"
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        existing=$(gh issue list --label workflow-failure --state open --json number,title \
+          --jq "map(select(.title == env.TITLE)) | .[0].number // empty")
+        if [ -n "$existing" ]; then
+          gh issue comment "$existing" --body "Failed again: $RUN_URL"
+        else
+          gh issue create --label workflow-failure --title "$TITLE" --body "Run failed: $RUN_URL"
+        fi

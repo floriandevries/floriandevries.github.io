@@ -1,0 +1,51 @@
+name: Weekly
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+concurrency:
+  group: weekly
+  cancel-in-progress: false
+
+jobs:
+  weekly:
+    if: github.event_name == 'schedule' || github.actor == 'fjdev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - id: week
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: scripts
+        run: |
+          title=$(python -m fjdev.week title)
+          existing=$(gh issue list --label this-week --state open --json number,title,state | python -m fjdev.week find "$title")
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+          echo "existing=$existing" >> "$GITHUB_OUTPUT"
+      - if: steps.week.outputs.existing == ''
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Follow prompts/weekly.md in ${{ github.repository }}.
+            The issue title is exactly: ${{ steps.week.outputs.title }}
+          claude_args: |
+            --max-turns 10
+            --permission-mode acceptEdits
+            --allowedTools "Bash(gh issue list:*),Bash(gh issue view:*),Bash(gh issue create:*),Read"
+      - if: failure()
+        uses: ./.github/actions/report-failure

@@ -1,0 +1,36 @@
+name: Scout
+
+on:
+  schedule:
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+concurrency:
+  group: scout
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    if: github.event_name == 'schedule' || github.actor == 'fjdev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Follow prompts/scout.md in ${{ github.repository }}.
+          claude_args: |
+            --max-turns 10
+            --permission-mode acceptEdits
+            --allowedTools "Bash(gh issue create:*),Bash(gh issue list:*),WebFetch,WebSearch"
+      - if: failure()
+        uses: ./.github/actions/report-failure
