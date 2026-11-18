@@ -35,6 +35,7 @@ def test_claude_workflow_restricted_to_owner():
     for name, job in jobs.items():
         assert "github.actor == 'fjdev'" in job["if"], name
         assert job["timeout-minutes"] == 15, name
+        assert job["concurrency"]["group"].startswith(f"claude-{name}-"), name
         for step in job["steps"]:
             if step.get("uses") != ACTION:
                 continue
