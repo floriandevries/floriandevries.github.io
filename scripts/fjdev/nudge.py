@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
-OWNER = "fjdev"
+OWNER = "floriandevries"
 BOT_LOGINS = {"claude", "claude[bot]", "github-actions", "github-actions[bot]"}
 ISSUE_LABELS = {"this-week", "idea"}
 ISSUE_WAIT = timedelta(hours=48)

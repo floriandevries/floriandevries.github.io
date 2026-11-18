@@ -33,7 +33,7 @@ def test_claude_workflow_restricted_to_owner():
     assert jobs
     action_steps = 0
     for name, job in jobs.items():
-        assert "github.actor == 'fjdev'" in job["if"], name
+        assert "github.actor == 'floriandevries'" in job["if"], name
         assert job["timeout-minutes"] == 15, name
         assert job["concurrency"]["group"].startswith(f"claude-{name}-"), name
         for step in job["steps"]:
@@ -93,7 +93,7 @@ def test_no_bare_edit_or_write_tools():
 def test_respond_job_limits_input_and_edits():
     respond = load("claude.yml")["jobs"]["respond"]
     (_, step), = claude_action_steps({"respond": respond})
-    assert step["with"]["include_comments_by_actor"] == "fjdev,claude[bot]"
+    assert step["with"]["include_comments_by_actor"] == "floriandevries,claude[bot]"
     denied = set(tool_list(step, "--disallowedTools"))
     assert {"Edit(scripts/**)", "Edit(.github/**)"} <= denied
 

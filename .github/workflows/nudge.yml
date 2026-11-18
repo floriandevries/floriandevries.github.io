@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   nudge:
-    if: github.event_name == 'schedule' || github.actor == 'fjdev'
+    if: github.event_name == 'schedule' || github.actor == 'floriandevries'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

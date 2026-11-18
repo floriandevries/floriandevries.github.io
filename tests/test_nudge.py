@@ -14,7 +14,7 @@ def ago(hours):
 def issue(hours, **kw):
     base = dict(number=1, kind="issue", labels=["this-week"], last_activity_by_owner=None,
                 last_activity_by_claude=ago(hours), created_at=ago(hours + 1), reviewed=False,
-                open=True, author="fjdev")
+                open=True, author="floriandevries")
     return Item(**{**base, **kw})
 
 
@@ -74,7 +74,7 @@ def test_cli_parses_gh_json():
         "prs": [{
             "number": 6, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z",
             "labels": [], "author": {"login": "claude", "is_bot": True},
-            "reviews": [], "comments": [{"author": {"login": "fjdev"}, "createdAt": "2026-11-11T06:00:00Z"}],
+            "reviews": [], "comments": [{"author": {"login": "floriandevries"}, "createdAt": "2026-11-11T06:00:00Z"}],
         }, {
             "number": 7, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z",
             "labels": [], "author": {"login": "claude", "is_bot": True},
