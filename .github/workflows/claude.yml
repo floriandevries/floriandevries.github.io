@@ -47,6 +47,7 @@ jobs:
           branch_prefix: "claude/"
           claude_args: |
             --max-turns 10
+            --permission-mode acceptEdits
             --append-system-prompt "Follow CLAUDE.md. When asked to draft, follow prompts/draft.md exactly."
             --allowedTools "Edit,Write,Read,Glob,Grep,Bash(hugo new:*),Bash(PYTHONPATH=scripts python -m fjdev.content_check:*),Bash(gh pr create:*),Bash(gh issue comment:*)"
 
@@ -69,6 +70,7 @@ jobs:
             Read the issue with gh issue view and reply with gh issue comment.
           claude_args: |
             --max-turns 10
+            --permission-mode acceptEdits
             --allowedTools "Bash(gh issue view:*),Bash(gh issue comment:*),Read"
 
   linkedin:
@@ -90,4 +92,5 @@ jobs:
             Read it with gh pr view and gh pr diff, then post the result with gh pr comment.
           claude_args: |
             --max-turns 10
+            --permission-mode acceptEdits
             --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Read"

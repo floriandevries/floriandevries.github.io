@@ -6,6 +6,24 @@ WORKFLOWS = Path(__file__).resolve().parent.parent / ".github" / "workflows"
 ACTION = "anthropics/claude-code-action@v1"
 
 
+def claude_action_steps(jobs):
+    for name, job in jobs.items():
+        for step in job["steps"]:
+            if step.get("uses") == ACTION:
+                yield name, step
+
+
+def assert_claude_steps_strict(jobs):
+    count = 0
+    for name, step in claude_action_steps(jobs):
+        count += 1
+        args = step["with"]["claude_args"]
+        assert "--max-turns 10" in args, name
+        assert "--permission-mode acceptEdits" in args, name
+    assert count
+    return count
+
+
 def test_claude_workflow_restricted_to_owner():
     text = (WORKFLOWS / "claude.yml").read_text()
     assert "ANTHROPIC_API_KEY" not in text
@@ -25,5 +43,5 @@ def test_claude_workflow_restricted_to_owner():
                 with_["claude_code_oauth_token"]
                 == "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}"
             ), name
-            assert "--max-turns 10" in with_["claude_args"], name
     assert action_steps == len(jobs)
+    assert assert_claude_steps_strict(jobs) == len(jobs)
