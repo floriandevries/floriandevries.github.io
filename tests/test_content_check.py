@@ -107,3 +107,12 @@ def test_denylist_multiword_whitespace(tmp_path):
     for sep in ("  ", "\t", "\n"):
         p = make(tmp_path, words(400) + f" A.B{sep}Corp")
         assert any("denylist" in e for e in check_file(p, ["A.B Corp"]))
+
+
+def test_denylist_covers_filename_and_extra_keys(tmp_path):
+    p = make(tmp_path, words(400))
+    named = p.rename(tmp_path / "contoso-migration.md")
+    errors = check_file(named, ["contoso"])
+    assert errors == ["denylist term found; remove or generalise it"]
+    errors = check_file(make(tmp_path, words(400), description="Work for Contoso"), ["contoso"])
+    assert errors == ["denylist term found; remove or generalise it"]

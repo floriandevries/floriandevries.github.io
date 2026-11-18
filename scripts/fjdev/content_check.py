@@ -68,10 +68,8 @@ def check_file(path, denylist):
         if not 300 <= count <= 600:
             errors.append(f"post body must be 300-600 words, found {count}")
 
-    haystack = " ".join(
-        [str(meta.get("title") or ""), str(meta.get("summary") or ""), " ".join(map(str, tags or [])), body]
-    )
-    haystack = re.sub(r"\s+", " ", haystack)
+    stem = Path(path).stem
+    haystack = re.sub(r"\s+", " ", f"{stem} {stem.replace('-', ' ')} {text}")
     for term in denylist:
         term = re.sub(r"\s+", " ", term)
         if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack, re.I):
@@ -87,7 +85,7 @@ def main(argv):
         print("::warning::FJDEV_DENYLIST is empty; denylist check skipped")
     failed = False
     for path in sorted(root.rglob("*.md")):
-        parts = path.relative_to(root).parts if path.is_relative_to(root) else path.parts
+        parts = path.relative_to(root).parts
         if path.name == "_index.md" or parts[0] not in ("posts", "snippets"):
             continue
         for err in check_file(path, denylist):
