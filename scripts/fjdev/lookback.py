@@ -29,7 +29,7 @@ def summarize(posts, open_issues, month):
         "month": month,
         "published": len(in_month),
         "by_type": dict(Counter(p.get("type") for p in in_month)),
-        "waiting": len(open_issues),
+        "waiting": len({i["number"] for i in open_issues}),
     }
 
 

@@ -22,6 +22,7 @@ class Item:
     reviewed: bool
     open: bool
     author: str = ""
+    author_is_bot: bool = False
 
 
 def is_bot(login, flagged=False):
@@ -40,7 +41,7 @@ def _eligible(item, now):
     if not ISSUE_LABELS & set(item.labels):
         return False
     bot_time = item.last_activity_by_claude
-    if bot_time is None and is_bot(item.author):
+    if bot_time is None and is_bot(item.author, item.author_is_bot):
         bot_time = item.created_at
     if bot_time is None:
         return False
@@ -59,7 +60,7 @@ def _time(value):
 
 
 def _latest(comments, wanted):
-    times = [_time(c["createdAt"]) for c in comments if wanted(c["author"]["login"])]
+    times = [_time(c["createdAt"]) for c in comments if wanted(c["author"]["login"], c["author"].get("is_bot", False))]
     return max(times, default=None)
 
 
@@ -67,7 +68,7 @@ def _item(raw, kind):
     author = raw["author"]
     login = author["login"]
     comments = raw.get("comments", [])
-    owner_time = _latest(comments, lambda who: who == OWNER)
+    owner_time = _latest(comments, lambda who, _bot: who == OWNER)
     reviewed = bool(raw.get("reviews")) or owner_time is not None
     return Item(
         number=raw["number"],
@@ -77,6 +78,7 @@ def _item(raw, kind):
         last_activity_by_claude=_latest(comments, is_bot),
         created_at=_time(raw["createdAt"]),
         reviewed=reviewed if kind == "pr" else False,
+        author_is_bot=author.get("is_bot", False),
         open=raw.get("state", "OPEN").upper() == "OPEN",
         author="dependabot[bot]" if login.removeprefix("app/") == "dependabot" else login,
     )

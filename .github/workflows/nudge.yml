@@ -36,12 +36,12 @@ jobs:
             | python -m fjdev.nudge > nudges.txt
           while read -r kind number; do
             if [ "$kind" = pr ]; then
-              body="Nudge: this draft has been waiting four days for your review."
+              body="Nudge: this PR has been waiting four days for your review."
             else
               body="Nudge: this one is waiting on your answer. Rough bullets are enough."
             fi
-            gh issue comment "$number" --body "$body"
             gh issue edit "$number" --add-label nudged
+            gh issue comment "$number" --body "$body"
           done < nudges.txt
       - if: failure()
         uses: ./.github/actions/report-failure

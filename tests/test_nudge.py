@@ -85,3 +85,16 @@ def test_cli_parses_gh_json():
     assert [(i.number, i.kind, i.reviewed) for i in items] == [(5, "issue", False), (6, "pr", True), (7, "pr", False)]
     assert nudge.lines(items, NOW) == ["issue 5", "pr 7"]
     json.dumps(data)
+
+
+def test_cli_honours_is_bot_flag():
+    data = {
+        "issues": [{
+            "number": 8, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z",
+            "labels": [{"name": "idea"}],
+            "author": {"login": "some-app", "is_bot": True},
+            "comments": [],
+        }],
+        "prs": [],
+    }
+    assert nudge.lines(nudge.parse(data), NOW) == ["issue 8"]
