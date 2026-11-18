@@ -8,7 +8,6 @@ on:
 permissions:
   contents: read
   issues: write
-  id-token: write
 
 concurrency:
   group: weekly
@@ -36,10 +35,9 @@ jobs:
           echo "existing=$existing" >> "$GITHUB_OUTPUT"
       - if: steps.week.outputs.existing == ''
         uses: anthropics/claude-code-action@v1
-        env:
-          GH_TOKEN: ${{ github.token }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
           prompt: |
             Follow prompts/weekly.md in ${{ github.repository }}.
             The issue title is exactly: ${{ steps.week.outputs.title }}

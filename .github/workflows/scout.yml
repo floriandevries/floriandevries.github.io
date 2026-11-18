@@ -8,7 +8,6 @@ on:
 permissions:
   contents: read
   issues: write
-  id-token: write
 
 concurrency:
   group: scout
@@ -22,10 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: anthropics/claude-code-action@v1
-        env:
-          GH_TOKEN: ${{ github.token }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
           prompt: |
             Follow prompts/scout.md in ${{ github.repository }}.
           claude_args: |

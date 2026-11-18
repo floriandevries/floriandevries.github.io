@@ -96,3 +96,12 @@ def test_respond_job_limits_input_and_edits():
     assert step["with"]["include_comments_by_actor"] == "fjdev,claude[bot]"
     denied = set(tool_list(step, "--disallowedTools"))
     assert {"Edit(scripts/**)", "Edit(.github/**)"} <= denied
+
+
+def test_scheduled_claude_runs_use_workflow_token():
+    for name in ("scout.yml", "weekly.yml", "lookback.yml"):
+        wf = load(name)
+        assert "id-token" not in wf["permissions"], name
+        for _, step in claude_action_steps(wf["jobs"]):
+            assert step["with"]["github_token"] == "${{ github.token }}", name
+            assert "GH_TOKEN" not in step.get("env", {}), name

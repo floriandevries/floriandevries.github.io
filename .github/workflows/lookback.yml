@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   issues: write
-  id-token: write
 
 concurrency:
   group: lookback
@@ -46,10 +45,9 @@ jobs:
             git push origin HEAD:main
           fi
       - uses: anthropics/claude-code-action@v1
-        env:
-          GH_TOKEN: ${{ github.token }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
           prompt: |
             Follow prompts/lookback.md in ${{ github.repository }}.
             The summary is: ${{ steps.summary.outputs.json }}
