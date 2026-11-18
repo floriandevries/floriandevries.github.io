@@ -1,5 +1,7 @@
 Write a LinkedIn version of the merged post. Read the post file and `STYLE.md`.
 
+If the merged PR adds no new post file under `content/`, do nothing.
+
 - Plain text. No markdown, no headings.
 - First person, Florian's voice per `STYLE.md`. Understated, no hype, no banned words.
 - Under 1,300 characters in total.
