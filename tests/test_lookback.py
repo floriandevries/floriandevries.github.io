@@ -20,6 +20,7 @@ def test_summarize_counts_by_type():
     assert out == {
         "month": "2026-10",
         "published": 3,
+        "total": 5,
         "by_type": {"how-to": 2, "snippet": 1},
         "waiting": 2,
     }
