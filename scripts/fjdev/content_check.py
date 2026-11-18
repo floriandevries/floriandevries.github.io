@@ -16,7 +16,10 @@ def split(text):
     m = re.match(r"---\r?\n(.*?)\r?\n---\r?\n?(.*)", text, re.S)
     if not m:
         return None, text
-    data = yaml.safe_load(m.group(1))
+    try:
+        data = yaml.safe_load(m.group(1))
+    except yaml.YAMLError:
+        return None, text
     return (data if isinstance(data, dict) else None), m.group(2)
 
 
@@ -33,7 +36,11 @@ def prose_and_fences(body):
 
 
 def check_file(path, denylist):
-    meta, body = split(Path(path).read_text(encoding="utf-8"))
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return ["missing or invalid front matter"]
+    meta, body = split(text)
     if meta is None:
         return ["missing or invalid front matter"]
     errors = [f"missing field: {f}" for f in FIELDS if meta.get(f) in (None, "", [])]
@@ -64,7 +71,9 @@ def check_file(path, denylist):
     haystack = " ".join(
         [str(meta.get("title") or ""), str(meta.get("summary") or ""), " ".join(map(str, tags or [])), body]
     )
+    haystack = re.sub(r"\s+", " ", haystack)
     for term in denylist:
+        term = re.sub(r"\s+", " ", term)
         if re.search(rf"(?<!\w){re.escape(term)}(?!\w)", haystack, re.I):
             errors.append("denylist term found; remove or generalise it")
             break

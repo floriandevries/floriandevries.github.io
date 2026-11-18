@@ -91,3 +91,18 @@ def test_cli(tmp_path):
     assert "bad.md: " in r.stdout and "300-600" in r.stdout
     assert "::warning::FJDEV_DENYLIST is empty; denylist check skipped" in r.stdout
     assert "about.md" not in r.stdout and "_index" not in r.stdout
+
+
+def test_malformed_yaml_reports_without_leaking(tmp_path):
+    p = tmp_path / "bad.md"
+    p.write_text('---\ntitle: "Contoso unclosed\ntype: how-to\n---\n\nbody\n')
+    errors = check_file(p, ["contoso"])
+    assert errors == ["missing or invalid front matter"]
+    p.write_bytes(b"---\n\xff\xfe\n---\n")
+    assert check_file(p, []) == ["missing or invalid front matter"]
+
+
+def test_denylist_multiword_whitespace(tmp_path):
+    for sep in ("  ", "\t", "\n"):
+        p = make(tmp_path, words(400) + f" A.B{sep}Corp")
+        assert any("denylist" in e for e in check_file(p, ["A.B Corp"]))
