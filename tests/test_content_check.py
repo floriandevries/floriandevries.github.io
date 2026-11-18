@@ -11,7 +11,7 @@ def make(tmp_path, body, **overrides):
     fields = {
         "title": "A title",
         "date": "2026-11-18",
-        "type": "how-to",
+        "kind": "how-to",
         "tags": "[terraform]",
         "summary": "Short summary.",
     }
@@ -47,9 +47,9 @@ def test_code_fences_not_counted(tmp_path):
 
 
 def test_snippet_needs_code_block(tmp_path):
-    p = make(tmp_path, "Just prose.", type="snippet")
+    p = make(tmp_path, "Just prose.", kind="snippet")
     assert any("code block" in e for e in check_file(p, []))
-    p = make(tmp_path, "Prose.\n\n```hcl\nmoved {}\n```", type="snippet")
+    p = make(tmp_path, "Prose.\n\n```hcl\nmoved {}\n```", kind="snippet")
     assert check_file(p, []) == []
 
 
@@ -67,8 +67,9 @@ def test_denylist_whole_word_and_title(tmp_path):
 
 
 def test_unknown_type_fails(tmp_path):
-    errors = check_file(make(tmp_path, words(400), type="news"), [])
-    assert any("type" in e for e in errors)
+    errors = check_file(make(tmp_path, words(400), kind="news"), [])
+    assert any("type" in e and "kind" in e for e in errors)
+    assert check_file(make(tmp_path, words(400), kind=None), []) == ["missing field: kind"]
 
 
 def test_bad_date_summary_tags(tmp_path):
@@ -95,7 +96,7 @@ def test_cli(tmp_path):
 
 def test_malformed_yaml_reports_without_leaking(tmp_path):
     p = tmp_path / "bad.md"
-    p.write_text('---\ntitle: "Contoso unclosed\ntype: how-to\n---\n\nbody\n')
+    p.write_text('---\ntitle: "Contoso unclosed\nkind: how-to\n---\n\nbody\n')
     errors = check_file(p, ["contoso"])
     assert errors == ["missing or invalid front matter"]
     p.write_bytes(b"---\n\xff\xfe\n---\n")

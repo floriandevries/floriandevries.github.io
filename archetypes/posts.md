@@ -1,7 +1,7 @@
 ---
 title: '{{ replace .File.ContentBaseName "-" " " | title }}'
 date: {{ .Date }}
-type: how-to
+kind: how-to
 tags: []
 summary: ''
 ---

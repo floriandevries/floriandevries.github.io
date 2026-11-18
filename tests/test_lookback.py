@@ -10,11 +10,11 @@ from test_workflows import WORKFLOWS, assert_claude_steps_strict, claude_action_
 
 def test_summarize_counts_by_type():
     posts = [
-        {"type": "how-to", "date": date(2026, 10, 3)},
-        {"type": "how-to", "date": datetime(2026, 10, 20, 8, 0)},
-        {"type": "snippet", "date": "2026-10-31"},
-        {"type": "opinion", "date": "2026-09-30"},
-        {"type": "exam-notes", "date": date(2026, 11, 1)},
+        {"kind": "how-to", "date": date(2026, 10, 3)},
+        {"kind": "how-to", "date": datetime(2026, 10, 20, 8, 0)},
+        {"kind": "snippet", "date": "2026-10-31"},
+        {"kind": "opinion", "date": "2026-09-30"},
+        {"kind": "exam-notes", "date": date(2026, 11, 1)},
     ]
     out = lookback.summarize(posts, [{"number": 1}, {"number": 2}], "2026-10")
     assert out == {

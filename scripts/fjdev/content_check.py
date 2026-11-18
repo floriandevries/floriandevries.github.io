@@ -8,7 +8,7 @@ import yaml
 
 POST_TYPES = {"how-to", "release-take", "exam-notes", "opinion"}
 TYPES = POST_TYPES | {"snippet"}
-FIELDS = ("title", "date", "type", "tags", "summary")
+FIELDS = ("title", "date", "kind", "tags", "summary")
 FENCE = re.compile(r"^\s*(```|~~~)")
 
 
@@ -54,12 +54,12 @@ def check_file(path, denylist):
     if tags not in (None, []) and not (isinstance(tags, list) and all(isinstance(t, str) for t in tags)):
         errors.append("tags must be a list of strings")
 
-    kind = meta.get("type")
+    kind = meta.get("kind")
     prose, fences = prose_and_fences(body)
     if kind in (None, ""):
         pass
     elif kind not in TYPES:
-        errors.append(f"unknown type; expected one of {', '.join(sorted(TYPES))}")
+        errors.append(f"unknown content type in kind; expected one of {', '.join(sorted(TYPES))}")
     elif kind == "snippet":
         if not fences:
             errors.append("snippet needs a fenced code block")
