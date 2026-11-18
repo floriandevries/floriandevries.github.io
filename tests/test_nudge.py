@@ -72,11 +72,11 @@ def test_cli_parses_gh_json():
             "comments": [{"author": {"login": "claude"}, "createdAt": "2026-11-14T06:00:00Z"}],
         }],
         "prs": [{
-            "number": 6, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z", "isDraft": True,
+            "number": 6, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z",
             "labels": [], "author": {"login": "claude", "is_bot": True},
             "reviews": [], "comments": [{"author": {"login": "fjdev"}, "createdAt": "2026-11-11T06:00:00Z"}],
         }, {
-            "number": 7, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z", "isDraft": False,
+            "number": 7, "state": "OPEN", "createdAt": "2026-11-10T06:00:00Z",
             "labels": [], "author": {"login": "claude", "is_bot": True},
             "reviews": [], "comments": [],
         }],

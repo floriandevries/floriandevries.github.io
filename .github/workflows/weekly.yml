@@ -23,7 +23,6 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - run: pip install -r requirements-dev.txt
       - id: week
         env:
           GH_TOKEN: ${{ github.token }}

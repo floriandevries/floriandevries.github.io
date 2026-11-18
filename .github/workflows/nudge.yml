@@ -24,7 +24,6 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - run: pip install -r requirements-dev.txt
       - env:
           GH_TOKEN: ${{ github.token }}
           PYTHONPATH: scripts
@@ -32,7 +31,7 @@ jobs:
           set -euo pipefail
           gh label create nudged --color D93F0B --description "Owner already nudged about this item" --force
           issues=$(gh issue list --state open --limit 200 --json number,state,labels,createdAt,author,comments)
-          prs=$(gh pr list --state open --limit 200 --json number,state,labels,createdAt,author,reviews,comments,isDraft)
+          prs=$(gh pr list --state open --limit 200 --json number,state,labels,createdAt,author,reviews,comments)
           jq -n --argjson issues "$issues" --argjson prs "$prs" '{issues: $issues, prs: $prs}' \
             | python -m fjdev.nudge > nudges.txt
           while read -r kind number; do
