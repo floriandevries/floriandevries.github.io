@@ -1,6 +1,6 @@
 baseURL = "https://fjdev.github.io/"
 title = "FJDEV"
-languageCode = "en"
+locale = "en"
 
 [outputs]
 home = ["HTML", "RSS"]
